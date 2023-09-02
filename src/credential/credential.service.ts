@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateCredentialDto } from './dto/create-credential.dto';
-import { UpdateCredentialDto } from './dto/update-credential.dto';
 import { CredentialRepository } from './credential.repository';
 import Cryptr from 'cryptr';
 import { Credential } from './types/credential.types';
@@ -37,21 +36,23 @@ export class CredentialService {
     const credential = await this.credentialRepository.findOne(credentialId);
     if (!credential) throw new NotFoundException();
     if (credential.userId !== userId) throw new ForbiddenException();
-    return credential;
+    return this.decryptCredential(credential);
   }
 
-  update(id: number, updateCredentialDto: UpdateCredentialDto) {
-    return `This action updates a #${id} credential`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} credential`;
+  async remove(userId: number, credentialId: number) {
+    return await this.credentialRepository.remove(userId, credentialId);
   }
 
   private encryptNewCredential(createCredentialDto: CreateCredentialDto) {
     const { password } = createCredentialDto;
     createCredentialDto.password = this.cryptr.encrypt(password);
     return createCredentialDto;
+  }
+
+  private decryptCredential(credential: Credential) {
+    const { password } = credential;
+    credential.password = this.cryptr.decrypt(password);
+    return credential;
   }
 
   private decryptCredentialsArray(credentials: Credential[]) {

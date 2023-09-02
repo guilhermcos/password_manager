@@ -3,15 +3,14 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
   ParseIntPipe,
+  Put,
 } from '@nestjs/common';
 import { CredentialService } from './credential.service';
 import { CreateCredentialDto } from './dto/create-credential.dto';
-import { UpdateCredentialDto } from './dto/update-credential.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { User } from '../decorators/custom.decorators';
 
@@ -44,16 +43,12 @@ export class CredentialController {
     return await this.credentialService.findOne(userId, credentialId);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateCredentialDto: UpdateCredentialDto,
-  ) {
-    return this.credentialService.update(+id, updateCredentialDto);
-  }
-
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.credentialService.remove(+id);
+  @UseGuards(AuthGuard)
+  remove(
+    @Param('id', ParseIntPipe) credentialId: number,
+    @User() userId: number,
+  ) {
+    return this.credentialService.remove(userId, credentialId);
   }
 }
