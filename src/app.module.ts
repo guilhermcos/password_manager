@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthGuard } from './auth/auth.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { CredentialModule } from './credential/credential.module';
+import { NoteModule } from './note/note.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CredentialModule } from './credential/credential.module';
     AuthModule,
     ConfigModule.forRoot(),
     CredentialModule,
+    NoteModule,
   ],
   controllers: [AppController],
   providers: [AppService],
